@@ -1,6 +1,12 @@
 #include "../../include/house.h"
 
-House::House() = default;
+House::House() {
+    this->voltageGrid = 0;
+    this->frequencyGrid = 0;
+
+    this->powerInto = 0;
+    this->currentInto = 0;
+};
 
 House::House(float voltageGrid, float frequencyGrid) {
     this->voltageGrid = voltageGrid;

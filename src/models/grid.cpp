@@ -1,6 +1,11 @@
 #include "../../include/grid.h"
 
-Grid::Grid() = default;
+Grid::Grid() {
+    this->voltageGrid = 0;
+    this->frequencyGrid = 0;
+
+    this->powerExchange = 0;
+}
 
 Grid::Grid(float voltageGrid, float frequencyGrid) {
     this->voltageGrid = voltageGrid;
