@@ -181,3 +181,12 @@ void Menu::showResults(House *house, PhotovoltaicPanel *panel, Grid *grid, Stora
     });
 }
 
+bool Menu::showExit() const {
+    console->print("\n");
+
+    return console->askForChoice("Do you want to exit?", {
+            "Yes, exit the program",
+            "No, repeat the process",
+    }) == 1;
+}
+

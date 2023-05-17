@@ -33,6 +33,8 @@ public:
     void showResults(House *house, PhotovoltaicPanel *panel, Grid *grid, Storage *storage) const;
 
     void showIntro();
+
+    bool showExit() const;
 };
 
 

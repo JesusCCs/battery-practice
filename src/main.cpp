@@ -6,20 +6,27 @@
 
 int main() {
     Menu menu;
+    bool exit;
 
-    menu.showIntro();
+    do {
 
-    auto photovoltaicPanel = menu.createPhotovoltaicPanel();
+        menu.showIntro();
 
-    auto house = menu.createHouse();
+        auto photovoltaicPanel = menu.createPhotovoltaicPanel();
 
-    auto grid = menu.createGrid();
+        auto house = menu.createHouse();
 
-    auto storage = menu.createStorage();
+        auto grid = menu.createGrid();
 
-    storage->manageEnergyOf(house, photovoltaicPanel, grid);
+        auto storage = menu.createStorage();
 
-    menu.showResults(house, photovoltaicPanel, grid, storage);
+        storage->manageEnergyOf(house, photovoltaicPanel, grid);
+
+        menu.showResults(house, photovoltaicPanel, grid, storage);
+
+        exit = menu.showExit();
+
+    } while (!exit);
 
     return 0;
 }
