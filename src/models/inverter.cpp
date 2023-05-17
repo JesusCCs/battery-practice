@@ -89,21 +89,7 @@ float Inverter::getMaxPowerToExchange() const {
 }
 
 float Inverter::getBatteryVoltage() const {
-    if (batteries->empty()) {
-        return 0;
-    }
-
-    float minVoltage = batteries->front()->getVoltage();
-
-    for (auto battery: *batteries) {
-        float voltage = battery->getVoltage();
-
-        if (voltage < minVoltage) {
-            minVoltage = voltage;
-        }
-    }
-
-    return minVoltage;
+    return batteryVoltage;
 }
 
 float Inverter::getBatteryCurrent() const {

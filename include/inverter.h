@@ -26,6 +26,11 @@ private:
     float batteryCurrent;
 
     /**
+     * Battery voltage in Volts
+     */
+    float batteryVoltage;
+
+    /**
      * Power inverter is releasing/storing in the batteries in Watts
      *      - positive value notates inverter power is flowing into the batteries (charging)
      *      - negative value notates battery power is flowing into the inverter (discharging)
