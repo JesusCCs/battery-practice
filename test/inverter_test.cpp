@@ -9,9 +9,9 @@ protected:
     float maxPowerToExchange = 100.0f;
 
     void SetUp() override {
-        batteries->push_back(new BatteryModule(100.0f));
-        batteries->push_back(new BatteryModule(150.0f));
-        batteries->push_back(new BatteryModule(100.0f));
+        batteries->push_back(new BatteryModule(100.0f, 12));
+        batteries->push_back(new BatteryModule(150.0f, 12));
+        batteries->push_back(new BatteryModule(100.0f, 12));
     }
 
     void TearDown() override {
@@ -99,13 +99,73 @@ TEST_F(InverterTest, TestChargeWithInverterChargingPartialCapacity) {
     EXPECT_EQ(inverter->getInverterPower(), maxPowerToExchange);
 }
 
-TEST_F(InverterTest, TestChargeWithInverterDischargingInMaximunCapacity) {
+TEST_F(InverterTest, TestFullDischargeWithoutLimitInInverter) {
+    auto maxPowerToExchange = totalBatteryPower();
+
+    auto inverter = new Inverter(maxPowerToExchange, batteries);
+
+    auto powerToDischarge = -totalBatteryPower();
+
+    float expectedToNotDischarge = 0.0f;
+
+    EXPECT_EQ(inverter->discharge(powerToDischarge), expectedToNotDischarge);
+    EXPECT_EQ(inverter->getInverterPower(), powerToDischarge);
+}
+
+TEST_F(InverterTest, TestFullDischargeWithLimitInInverter) {
+    auto inverter = new Inverter(maxPowerToExchange, batteries);
+
+    auto powerToDischarge = -totalBatteryPower();
+
+    auto maxPowerExpectedToDischarge = - maxPowerToExchange;
+
+    auto expectedToNotDischarge = powerToDischarge - maxPowerExpectedToDischarge;
+
+    EXPECT_EQ(inverter->discharge(powerToDischarge), expectedToNotDischarge);
+    EXPECT_EQ(inverter->getInverterPower(), maxPowerExpectedToDischarge);
+}
+
+TEST_F(InverterTest, TestFullDischargeWithLimitInBatteries) {
+    float batteriesTotalPower = totalBatteryPower();
+    float differenceBetweenBatteriesAndInverter = 1.0f;
+    float inverterMaxPower = batteriesTotalPower + differenceBetweenBatteriesAndInverter;
+
+    auto inverter = new Inverter(inverterMaxPower, batteries);
+
+    EXPECT_EQ(inverter->discharge(-inverterMaxPower), -differenceBetweenBatteriesAndInverter);
+    EXPECT_EQ(inverter->getInverterPower(), -batteriesTotalPower);
+}
+
+TEST_F(InverterTest, TestPartialDischarge) {
+    auto inverter = new Inverter(maxPowerToExchange, batteries);
+
+    float toDischarge = -50.0f;
+    float expectedNotDischarge = 0.0f;
+
+    EXPECT_EQ(inverter->discharge(toDischarge), expectedNotDischarge);
+    EXPECT_EQ(inverter->getInverterPower(), toDischarge);
+}
+
+TEST_F(InverterTest, TestDischargeWithInverterDishargingInMaximunCapacity) {
     auto inverter = new Inverter(maxPowerToExchange, -maxPowerToExchange, batteries);
 
-    float toCharge = 50.0f;
+    float toDischarge = -50.0f;
 
-    EXPECT_EQ(inverter->charge(toCharge), 0.0f);
-    EXPECT_EQ(inverter->getInverterPower(), maxPowerToExchange);
+    EXPECT_EQ(inverter->discharge(toDischarge), toDischarge);
+    EXPECT_EQ(inverter->getInverterPower(), -maxPowerToExchange);
+}
+
+TEST_F(InverterTest, TestDischargeWithInverterChargingPartialCapacity) {
+    float toDischarge = -150.0f;
+
+    float powerDischarging = - maxPowerToExchange * 0.5f;
+
+    float powerNotDischarged = toDischarge - powerDischarging;
+
+    auto inverter = new Inverter(maxPowerToExchange, powerDischarging, batteries);
+
+    EXPECT_EQ(inverter->discharge(toDischarge), powerNotDischarged);
+    EXPECT_EQ(inverter->getInverterPower(), - maxPowerToExchange);
 }
 
 TEST_F(InverterTest, TestInvalidMaxPower) {

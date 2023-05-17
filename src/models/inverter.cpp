@@ -79,7 +79,7 @@ float Inverter::discharge(float powerToDischarge) {
         }
     }
 
-    inverterPower += powerLeftToDischargeBatteries;
+    inverterPower -= powerLeftToDischargeBatteries;
 
     return powerMissing + powerLeftToDischargeBatteries;
 }

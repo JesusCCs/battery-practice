@@ -39,7 +39,7 @@ TEST_F(BatteryModuleTest, TestDischargeInNotMaxPowerRange) {
 }
 
 TEST_F(BatteryModuleTest, TestInvalidMaxPower) {
-    EXPECT_THROW(BatteryModule(-50.0f), std::invalid_argument);
+    EXPECT_THROW(BatteryModule(-50.0f, 12), std::invalid_argument);
 }
 
 TEST_F(BatteryModuleTest, TestInvalidChargePower) {
