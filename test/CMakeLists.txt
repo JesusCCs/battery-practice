@@ -16,6 +16,7 @@ add_library(
         ../src/models/house.cpp
         ../src/models/photovoltaic_panel.cpp
         ../src/models/storage.cpp
+        ../src/services/console.cpp
 )
 
 add_executable(
