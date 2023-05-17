@@ -28,7 +28,7 @@ add_executable(
         mocks/mock_house.cpp
         mocks/mock_photovoltaic_panel.cpp
         mocks/mock_storage.cpp
-        grid_test.cpp house_test.cpp photovoltaic_panel_test.cpp)
+        grid_test.cpp house_test.cpp photovoltaic_panel_test.cpp console_test.cpp)
 
 target_link_libraries(test_run gtest gtest_main)
 target_link_libraries(test_run gmock gmock_main)

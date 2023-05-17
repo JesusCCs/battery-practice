@@ -1,10 +1,11 @@
 #ifndef MENU_H
 #define MENU_H
 
-#include "../include/photovoltaic_panel.h"
-#include "../include/house.h"
-#include "../include/grid.h"
-#include "../include/storage.h"
+#include "photovoltaic_panel.h"
+#include "house.h"
+#include "grid.h"
+#include "storage.h"
+#include "console.h"
 
 class Menu {
 private:
@@ -13,7 +14,11 @@ private:
 
     int maxBatteries = 1;
 
+    Console *console;
+
 public:
+
+    Menu();
 
     PhotovoltaicPanel *createPhotovoltaicPanel() const;
 
