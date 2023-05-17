@@ -9,20 +9,25 @@
 class Menu {
 private:
 
+    bool onlyImportantParameters = false;
+
+    int maxBatteries = 1;
+
 public:
 
-    PhotovoltaicPanel *createPhotovoltaicPanel();
+    PhotovoltaicPanel *createPhotovoltaicPanel() const;
 
-    House *createHouse();
+    House *createHouse() const;
 
-    Grid *createGrid();
+    Grid *createGrid() const;
 
-    Storage *createStorage();
+    Storage *createStorage() const;
 
-    std::vector<BatteryModule *> *createBatteries();
+    std::vector<BatteryModule *> *createBatteries() const;
 
-    void showResults(House *house, PhotovoltaicPanel *panel, Grid *grid, Storage *storage);
+    void showResults(House *house, PhotovoltaicPanel *panel, Grid *grid, Storage *storage) const;
 
+    void showIntro();
 };
 
 

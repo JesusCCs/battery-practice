@@ -7,6 +7,8 @@
 int main() {
     Menu menu;
 
+    menu.showIntro();
+
     auto photovoltaicPanel = menu.createPhotovoltaicPanel();
 
     auto house = menu.createHouse();

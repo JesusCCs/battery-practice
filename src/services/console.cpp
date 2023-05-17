@@ -57,30 +57,44 @@ float Console::askForFloat(const std::string &message, bool positiveOnly) {
     return value;
 }
 
+int Console::askForInteger(const std::string& message, int max, int min)
+{
+    float value;
+
+    while (true) {
+        value = Console::askForFloat(message, min >= 0);
+
+        if (value > max) {
+            std::cout << "Value cannot be greater than " << max << ", please try again." << std::endl;
+            continue;
+        }
+
+        if (value < min) {
+            std::cout << "Value cannot be less than " << min << ", please try again." << std::endl;
+            continue;
+        }
+
+        if (value != (int)value) {
+            std::cout << "Value must be an integer, please try again." << std::endl;
+            continue;
+        }
+
+        break;
+    }
+
+    return (int)value;
+}
+
 int Console::askForChoice(const std::string &message, std::vector<std::string> options) {
     int choice;
 
-    while (true) {
-        std::cout << message << std::endl;
+    std::cout << message << std::endl;
 
-        for (int i = 0; i < options.size(); i++) {
-            std::cout << "  " << i << ". " << options[i] << std::endl;
-        }
-
-        std::cout << "Please enter your choice: ";
-        std::cin >> choice;
-
-        if (std::cin.fail()) {
-            std::cout << "Invalid choice, please try again." << std::endl;
-
-            std::cin.clear();
-            std::cin.ignore(32767, '\n');
-        } else if (choice < 0 || choice >= options.size()) {
-            std::cout << "Invalid choice, please try again." << std::endl;
-        } else {
-            break;
-        }
+    for (int i = 1; i <= options.size(); i++) {
+        std::cout << "  " << i << ". " << options[i - 1] << std::endl;
     }
+
+    choice = Console::askForInteger("Please enter your choice:", options.size(), 1);
 
     return choice;
 }

@@ -37,6 +37,15 @@ public:
     static float askForFloat(const std::string& message, bool positiveOnly = false);
 
     /**
+     * Method to ask the user for a integer value.
+     * It will keep asking until the user enters a valid integer value.
+     *
+     * It will limit the maximum value that the user can enter.
+     * Optionally, you can force to be a positive value.
+     */
+    static int askForInteger(const std::string& message, int max, int min);
+
+    /**
      * Method to present the user with a number of options and ask for a choice.
      * It will keep asking until the user enters a valid choice.
      */

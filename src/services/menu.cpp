@@ -1,25 +1,77 @@
 #include "../../include/menu.h"
 #include "../../include/console.h"
 
-PhotovoltaicPanel *Menu::createPhotovoltaicPanel() {
+int BASIC_SETUP_MAX_BATTERIES = 2;
+int STANDARD_SETUP_MAX_BATTERIES = 3;
+int PRO_SETUP_MAX_BATTERIES = 5;
+
+void Menu::showIntro() {
+    auto option = Console::askForChoice("You can choose between the following options:", {
+            "Create with only the parameters to use in the algorithm (power)",
+            "Create with all the parameters",
+    });
+
+    onlyImportantParameters = option == 1;
+
+    auto setup = Console::askForChoice("Now, you must choose the system setup:", {
+            "Basic, up to two battery modules",
+            "Standard, up to three battery modules",
+            "Pro, up to five battery modules",
+    });
+
+    int possibleMaxBattery;
+
+    switch (setup) {
+        case 1:
+            possibleMaxBattery = BASIC_SETUP_MAX_BATTERIES;
+            break;
+        case 2:
+            possibleMaxBattery = STANDARD_SETUP_MAX_BATTERIES;
+            break;
+        case 3:
+            possibleMaxBattery = PRO_SETUP_MAX_BATTERIES;
+            break;
+
+        default:
+            throw std::invalid_argument("Invalid setup");
+    }
+
+    maxBatteries = Console::askForInteger(
+            "Enter the maximum number of batteries:", possibleMaxBattery, 1
+    );
+
+    Console::printSeparator();
+}
+
+
+PhotovoltaicPanel *Menu::createPhotovoltaicPanel() const {
     Console::printTitle("Photovoltaic Panel Data");
 
-    auto defaultVoltage = 200.0f;
+    auto voltageProduction = onlyImportantParameters ? 200.0f : Console::askForFloat(
+            "Enter the photovoltaic panel voltage production:", true
+    );
 
-    auto powerProduction = Console::askForFloat("Enter the photovoltaic panel power production:", true);
+    auto powerProduction = Console::askForFloat(
+            "Enter the photovoltaic panel power production:", true
+    );
 
-    auto photovoltaicPanel = new PhotovoltaicPanel(powerProduction, defaultVoltage);
+    auto photovoltaicPanel = new PhotovoltaicPanel(powerProduction, voltageProduction);
 
     return photovoltaicPanel;
 }
 
-House *Menu::createHouse() {
+House *Menu::createHouse() const {
     Console::printTitle("House Data");
 
-    auto defaultVoltage = 230.0f;
-    auto defaultFrequency = 50.0f;
+    auto houseVoltage = onlyImportantParameters ? 230.0f : Console::askForFloat(
+            "Enter the house voltage:", true
+    );
 
-    auto house = new House(defaultVoltage, defaultFrequency);
+    auto houseFrequency = onlyImportantParameters ? 50.0f : Console::askForFloat(
+            "Enter the house frequency:", true
+    );
+
+    auto house = new House(houseVoltage, houseFrequency);
 
     auto powerConsumption = Console::askForFloat("Enter the house power consumption:", true);
 
@@ -28,14 +80,18 @@ House *Menu::createHouse() {
     return house;
 }
 
-Grid *Menu::createGrid() {
-    auto defaultVoltage = 240.0f;
-    auto defaultFrequency = 50.0f;
+Grid *Menu::createGrid() const {
+    auto gridVoltage = onlyImportantParameters ? 240.0f : Console::askForFloat(
+            "Enter the grid voltage:", true
+    );
+    auto gridFrequency = onlyImportantParameters ? 50.0f : Console::askForFloat(
+            "Enter the grid frequency:", true
+    );
 
-    return new Grid(defaultVoltage, defaultFrequency);
+    return new Grid(gridVoltage, gridFrequency);
 }
 
-Storage *Menu::createStorage() {
+Storage *Menu::createStorage() const {
     Console::printTitle("Storage Data");
 
     auto maxPowerInverter = Console::askForFloat(
@@ -53,17 +109,25 @@ Storage *Menu::createStorage() {
     return storage;
 }
 
-std::vector<BatteryModule *> *Menu::createBatteries() {
+std::vector<BatteryModule *> *Menu::createBatteries() const {
     auto batteries = new std::vector<BatteryModule *>();
 
-    batteries->push_back(new BatteryModule(100.0f, 12));
-    batteries->push_back(new BatteryModule(200.0f, 12));
-    batteries->push_back(new BatteryModule(300.0f, 12));
+    for (int i = 0; i < maxBatteries; i++) {
+        float maxPower = Console::askForFloat(
+            "Enter the max power of the battery #" + std::to_string(i + 1) + ":", true
+        );
+
+        float voltage = onlyImportantParameters ? 12 : Console::askForFloat(
+            "Enter the voltage of the battery #" + std::to_string(i + 1) + ":", true
+        );
+
+        batteries->push_back(new BatteryModule(maxPower, voltage));
+    }
 
     return batteries;
 }
 
-void Menu::showResults(House *house, PhotovoltaicPanel *panel, Grid *grid, Storage *storage) {
+void Menu::showResults(House *house, PhotovoltaicPanel *panel, Grid *grid, Storage *storage) const {
     Console::printTitle("Results");
 
     // BMS Info
@@ -80,17 +144,17 @@ void Menu::showResults(House *house, PhotovoltaicPanel *panel, Grid *grid, Stora
 
     for (int i = 0; i < batteries->size(); i++) {
         batteriesInfo.push_back({
-                                        std::to_string(i + 1),
-                                        Console::fixNumber(batteries->at(i)->getMaxPower(), 2) + " W"
-                                });
+            std::to_string(i + 1),
+            Console::fixNumber(batteries->at(i)->getMaxPower(), 2) + " W"
+        });
 
         batteryTotal += batteries->at(i)->getMaxPower();
     }
 
     batteriesInfo.push_back({
-                                    "Total:",
-                                    Console::fixNumber(batteryTotal, 2) + " W"
-                            });
+        "Total:",
+        Console::fixNumber(batteryTotal, 2) + " W"
+    });
 
     Console::printTable(batteriesInfo);
 
@@ -99,16 +163,13 @@ void Menu::showResults(House *house, PhotovoltaicPanel *panel, Grid *grid, Stora
     Console::print("\nFinal Results:\n");
 
     Console::printTable({
-                                {"House Power Consumption", "PV Production", "Grid Exchange", "Storage Exchange"},
-                                {
-                                 Console::fixNumber(house->getPowerConsumption(), 2) + " W",
-                                                            Console::fixNumber(panel->getPowerProduction(), 2) + " W",
-                                                                             Console::fixNumber(
-                                                                                     grid->getPowerExchange(), 2) +
-                                                                             " W",
-                                                                                              Console::fixNumber(
-                                                                                                      storage->getPowerExchange(),
-                                                                                                      2) + " W"
-                                }
-                        });
+        {"House Power Consumption", "PV Production", "Grid Exchange", "Storage Exchange"},
+        {
+            Console::fixNumber(house->getPowerConsumption(), 2) + " W",
+            Console::fixNumber(panel->getPowerProduction(), 2) + " W",
+            Console::fixNumber(grid->getPowerExchange(), 2) + " W",
+            Console::fixNumber(storage->getPowerExchange(), 2) + " W"
+        }
+    });
 }
+
