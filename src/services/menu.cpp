@@ -81,9 +81,14 @@ House *Menu::createHouse() const {
 }
 
 Grid *Menu::createGrid() const {
+    if (!onlyImportantParameters) {
+        Console::printTitle("Grid Data");
+    }
+
     auto gridVoltage = onlyImportantParameters ? 240.0f : Console::askForFloat(
             "Enter the grid voltage:", true
     );
+
     auto gridFrequency = onlyImportantParameters ? 50.0f : Console::askForFloat(
             "Enter the grid frequency:", true
     );
@@ -132,7 +137,7 @@ void Menu::showResults(House *house, PhotovoltaicPanel *panel, Grid *grid, Stora
 
     // BMS Info
 
-    Console::print("Battery Modules:\n");
+    Console::print("A table with the selected data for the battery modules:\n");
 
     auto batteries = storage->getBatteryModules();
 
@@ -160,7 +165,7 @@ void Menu::showResults(House *house, PhotovoltaicPanel *panel, Grid *grid, Stora
 
     // Final Results Info
 
-    Console::print("\nFinal Results:\n");
+    Console::print("\nA table with the final status for the elements:\n");
 
     Console::printTable({
         {"House Power Consumption", "PV Production", "Grid Exchange", "Storage Exchange"},
